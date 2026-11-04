@@ -1,0 +1,19 @@
+# 敏感配置
+.env
+
+# 虚拟环境
+.venv/
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 生成的图片文件（避免仓库过大）
+*.png
+*.jpg
+*.jpeg
+
+# 系统文件
+.DS_Store
+.vscode/
+.idea/

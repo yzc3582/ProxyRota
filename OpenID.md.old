@@ -1,0 +1,48 @@
+你说得对，获取群 OpenID 确实是第一步。把方案聚焦到“现拉一个第三方机器人进群查询”，是更直接、也更干净的做法。
+
+以下是细化后的 **README 配置片段**，专门用于获取两个关键的 OpenID。
+
+---
+
+### 📖 获取 OpenID（Group 与 RotaBOT）
+
+`ProxyRota` 需要两个 OpenID 才能正常工作：
+
+1.  **`GROUP_OPENID`**：`ProxyRota` 和 RotaBOT 共同所在的群聊的 ID。
+2.  **`ROTABOT_OPENID`**：RotaBOT 在这个群内的成员 ID。
+
+这两个值无法通过 QQ 号直接查看，但**可以临时邀请一个支持查询功能的第三方机器人进群，通过指令一次性拿到**。用完即踢，不会对群造成长期影响。
+
+#### 推荐工具与指令
+
+以下两个机器人都基于 QQ 官方机器人协议，查询的是**与你自己的 `ProxyRota` 所使用的 `AppID` 无关的、独立于你的应用的 OpenID**。这意味着，**你拿到 RotaBOT 的 OpenID 后，不能直接用于你的 `ProxyRota`**。你需要的是在**你的机器人所在的群聊上下文中**的 OpenID。因此，**最可靠的方式是：把查询机器人拉进你将运行 `ProxyRota` 的那个群**，然后在该群内查询。
+
+**工具 A：HuHoBot**
+
+- **指令**：在群内发送 `@HuHoBot /查信息`。
+- **返回内容**：**你的个人 OpenID** 和 **当前群的 OpenID**。群 OpenID 直接填入 `GROUP_OPENID` 即可。
+- **获取 RotaBOT 的 OpenID**：HuHoBot 的 `/查信息` 默认只查自己。要查 RotaBOT，需要使用管理员指令 `/查信息 <openid>`，但前提是你知道 RotaBOT 的 OpenID……这陷入了循环。因此，**HuHoBot 更适合用来获取 `GROUP_OPENID`**。
+
+**工具 B：dsh-qq-bot（或其衍生版本）**
+
+- **指令**：在群内 `@dsh-qq-bot /whoami`（或 `/id`）。
+- **返回内容**：当前会话的 **OpenID**，包括 `group_openid`。同样，这主要解决群 OpenID 的获取。
+- **关于 RotaBOT 的 OpenID**：部分版本支持 `id_lookup` 按昵称查询，但前提是目标成员**在群内发过言**，且查询精确度依赖昵称。RotaBOT 在群内当然会发言，所以理论上可以尝试，但昵称匹配存在不确定性。
+
+#### 更稳妥的变通方法：利用 `ProxyRota` 自身的“全量消息”调试模式
+
+既然第三方工具查询他人 OpenID 都有局限，**最可靠、且不依赖任何外部机器人的方法，仍然是你之前考虑过的“全量消息”调试模式**，只是需要调整一下获取顺序：
+
+1.  **先获取 `GROUP_OPENID`**：临时拉一个 HuHoBot 或 dsh-qq-bot 进群，用 `/查信息` 或 `/whoami` 拿到群 OpenID。完成后将其移出群聊。
+2.  **再获取 `ROTABOT_OPENID`**：在你的 `ProxyRota` 代码中临时开启全量消息接收（`Intents(public_messages=True)` 并确保平台后台也开启了全量权限），在 `on_group_at_message_create` 开头加一行 `print(message.mentions)`。
+3.  在群内 **@RotaBOT 发送任意指令**（例如 `/login`），让 RotaBOT 回复一条消息。你的 `ProxyRota` 日志会打印出这条回复的 `mentions` 列表，其中 `bot: True` 对应的 `member_openid` 就是 **`ROTABOT_OPENID`**。
+4.  拿到两个值后，**立即删除调试打印代码**，关闭全量模式（如果不需要长期监听群消息），并将 OpenID 填入 `.env`。
+
+#### 💡 总结
+
+| 目标 | 推荐方式 | 说明 |
+| :--- | :--- | :--- |
+| **`GROUP_OPENID`** | 临时拉 HuHoBot / dsh-qq-bot 进群，用 `/查信息` 或 `/whoami` 获取 | 快速、直接，无需修改你的代码 |
+| **`ROTABOT_OPENID`** | **临时开启 `ProxyRota` 的全量消息调试模式**，在 RotaBOT 回复时从 `mentions` 字段捕获 | 最可靠，不依赖第三方工具的昵称匹配精度 |
+
+将这两个值填入 `.env` 后，你的 `ProxyRota` 就可以正常工作了。临时拉入的查询机器人记得及时移出群聊，以保持群环境的整洁。

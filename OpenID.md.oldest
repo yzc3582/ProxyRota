@@ -1,0 +1,29 @@
+#### 方法一：利用“全量消息”意图自动打印（推荐）
+
+QQ 官方机器人的消息事件中，本身就携带了 `group_openid` 和发送者的 `member_openid`。
+
+1. 在 QQ 开放平台的机器人管理后台，为你的机器人开启“接收所有消息”（全量模式）。
+2. 在 `proxy_rota.py` 的 `on_group_at_message_create` 方法开头，临时加入一行打印：
+
+```python
+async def on_group_at_message_create(self, message: GroupMessage):
+    print(f"[DEBUG] group_openid={message.group_openid}, member_openid={message.author.member_openid}")
+    # ... 其余代码
+```
+
+`GroupMessage` 对象的 `group_openid` 属性就是当前群的 OpenID，`message.author.member_openid` 则是发送者在群内的 OpenID。
+
+3. 运行程序，在目标群内** @ 你的机器人 随便发一条消息**。程序日志会立刻打印出：
+   - 第一次打印时，`member_openid` 是你自己的（发消息的人）。记下这个值，但这**不是** RotaBOT 的。
+   - 接着，在群内 **@RotaBOT 发送任意有效指令**（如 `/login` 或 `/b40`），让 RotaBOT 回复一条 **@ 你机器人** 的消息。
+   - 当 RotaBOT 的回复到达时，日志会再次打印。这一次，`member_openid` 的值就是 **RotaBOT 在群内的 OpenID**。
+   - 两次打印中 `group_openid` 的值是同一个，这就是你需要填入 `.env` 的 `GROUP_OPENID`。
+
+4. 拿到两个值后，**删除这行调试打印**，将值填入 `.env` 即可。
+
+#### 方法二：借助支持 OpenID 查询的第三方机器人
+
+如果目标群内恰好有其他支持查询 OpenID 的机器人（如 HuHoBot 的 `/查信息` 命令），也可以用来交叉验证或快速获取：
+
+- 在群内输入 `/查信息`，机器人通常会返回 **你的个人 OpenID** 和 **当前群的 OpenID**。
+- 再用同样方式查询 RotaBOT 的 OpenID（如果对方支持指定查询）。这种方法依赖于群内恰好有此类机器人，因此**方法一更通用、更直接**。

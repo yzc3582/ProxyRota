@@ -1,0 +1,8 @@
+# QQ 机器人 SDK (基于官方 API v2 的社区维护版，支持全量群消息事件 GROUP_MESSAGE_CREATE)
+qq-botpy-v2>=1.0.2
+
+# 异步 HTTP 客户端 (用于高速、流式下载 RotaBOT 生成的图片)
+aiohttp>=3.9.0
+
+# 环境变量加载库 (用于读取 .env 外部配置文件)
+python-dotenv>=1.0.0
