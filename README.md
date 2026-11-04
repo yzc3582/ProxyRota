@@ -1,3 +1,15 @@
+# Do not use it,it can't do anything
+
+# 别用，没用！！！！！！
+
+想想，既然这是一个交互性的非AI的BOT，还是发出来吧
+
+现在已经是史山了，不建议参考
+
+您可以使用更轻量的 DownRota（开发状态请自行在我名下搜索）
+
+原因如下
+
 # DEPRECATED
 
 找不到直接 @RotaBOT 的方法，得重构了
