@@ -1,6 +1,7 @@
 # DEPRECATED
 
-找不到直接@RotaBOT的方法，得重构了
+找不到直接 @RotaBOT 的方法，得重构了
+而且屋漏偏逢连夜雨，GitHub SSH 不上了，已跑比去 gitcode
 
 # ProxyRota
 
