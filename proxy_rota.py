@@ -131,7 +131,7 @@ class ProxyRotaBot(botpy.Client):
             await self.api.post_group_message(
                 group_openid=GROUP_OPENID,
                 msg_type=0,
-                content=f"<@!{ROTABOT_OPENID}> {command}"
+                content=f"<@ {ROTABOT_OPENID}> {command}"
             )
             print(f"📤 [发送] {req_name} ({command})，等待回复...")
             return await asyncio.wait_for(fut, timeout=timeout)

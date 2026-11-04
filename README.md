@@ -1,3 +1,7 @@
+# DEPRECATED
+
+找不到直接@RotaBOT的方法，得重构了
+
 # ProxyRota
 
 `ProxyRota` 是一个面向 Rotaeno 玩家的自动化 B40 / Rating 追踪工具。它通过 QQ 官方机器人协议，作为一个“代理”自动与群内的查询机器人（如 RotaBOT）交互，定时拉取并保存你的 B40 图片，方便在 OBS 等直播软件中实时展示。
